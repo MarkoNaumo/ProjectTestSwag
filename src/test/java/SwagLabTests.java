@@ -6,6 +6,10 @@ import org.testng.annotations.Test;
 public class SwagLabTests extends BaseTest{
 
     LoginPage loginPage;
+    InventoryPage inventoryPage;
+    CartPage cartPage;
+
+    CheckoutStepOnePage checkoutStepOnePage;
 
 
     @BeforeMethod
@@ -13,6 +17,9 @@ public class SwagLabTests extends BaseTest{
     {
         driver = openBrowser();
         loginPage = new LoginPage(driver);
+        inventoryPage = new InventoryPage(driver);
+        cartPage = new CartPage(driver);
+        checkoutStepOnePage = new CheckoutStepOnePage(driver);
     }
 
     @Test
@@ -21,6 +28,24 @@ public class SwagLabTests extends BaseTest{
         loginPage.LoginOnPage("standard_user","secret_sauce");
 
         Assert.assertEquals(driver.getCurrentUrl(),"https://www.saucedemo.com/inventory.html");
+    }
+
+    @Test
+    public void buyProduct()
+    {
+        loginPage.LoginOnPage("standard_user","secret_sauce");
+        inventoryPage.addBackpack();
+        inventoryPage.clickOnCart();
+        Assert.assertEquals(cartPage.getInfoPrice(),"$29.99");
+        Assert.assertEquals(cartPage.getProductName(),"Sauce Labs Backpack");
+
+        cartPage.clickCheckout();
+        checkoutStepOnePage.inputPersonalInfo("Marko","Naumovic","11000");
+        Assert.assertEquals(driver.getCurrentUrl(),"https://www.saucedemo.com/checkout-step-two.html");
+        checkoutStepOnePage.clickFinish();
+
+        Assert.assertEquals(checkoutStepOnePage.getInfoMessage(),"Thank you for your order!");
+
     }
 
     @AfterMethod
